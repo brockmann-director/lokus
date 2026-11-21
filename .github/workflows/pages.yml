@@ -34,9 +34,9 @@ jobs:
       - name: Toiletten-Daten
         run: |
           if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.fresh }}" = "false" ]; then
-            python3 tools/fetch_osm.py _site --fallback https://lokus.thisisjan.com --reuse
+            python3 tools/fetch_osm.py _site --fallback http://lokus.thisisjan.com --reuse
           else
-            python3 tools/fetch_osm.py _site --fallback https://lokus.thisisjan.com
+            python3 tools/fetch_osm.py _site --fallback http://lokus.thisisjan.com
           fi
           cat _site/data/index.json | head -c 400
       - uses: actions/upload-pages-artifact@v3
