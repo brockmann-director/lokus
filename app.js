@@ -1,7 +1,7 @@
 // Lokus – nächste Toilette finden. Daten: OpenStreetMap (wöchentlich als Kacheln in data/),
 // gemeinsame Bewertungen/Notizen/Favoriten der Familie über Supabase (lk_*-Funktionen).
 "use strict";
-const VERSION = "1.0";
+const VERSION = "1.1";
 
 // ---------- Kleinkram ----------
 const $ = id => document.getElementById(id);
@@ -192,11 +192,11 @@ map.attributionControl.setPrefix(false);
 let baseLayer;
 function setBase() {
   const dark = isDark();
-  const url = dark ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
-  if (baseLayer) map.removeLayer(baseLayer);
-  baseLayer = L.tileLayer(url, { subdomains: "abcd", maxZoom: 19, detectRetina: false,
-    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>' }).addTo(map);
+  // Freie OSM-Karte (ohne Schlüssel); im Dunkelmodus per CSS-Filter abgedunkelt
+  document.getElementById("map").classList.toggle("map-dark", dark);
+  if (baseLayer) return;
+  baseLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
 }
 const pinLayer = L.layerGroup().addTo(map);
 let meMarker = null, accCircle = null;

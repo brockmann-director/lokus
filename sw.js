@@ -1,7 +1,7 @@
 // Lokus Service Worker: App und Daten offline verfügbar.
 // App-Dateien: erst Netz, sonst Speicher. Toiletten-Daten: Speicher sofort, im Hintergrund auffrischen.
 // Kartenbilder: aus dem Speicher, wenn schon einmal geladen (höchstens ~3000 Stück).
-const V = "lokus-1.0";
+const V = "lokus-1.1";
 const SHELL = ["./", "index.html", "style.css?v=1", "app.js?v=1", "oh.js?v=1", "config.js?v=1", "vendor/leaflet.js?v=1.9.4", "vendor/leaflet.css?v=1.9.4",
   "icon.svg", "icon-192.png", "apple-touch-icon.png", "manifest.webmanifest",
   "vendor/fonts/atkinson-hyperlegible-latin-400-normal.woff2", "vendor/fonts/atkinson-hyperlegible-latin-700-normal.woff2", "vendor/fonts/bricolage-grotesque-latin-800-normal.woff2"];
@@ -16,7 +16,7 @@ async function trim(name, max) {
 self.addEventListener("fetch", e => {
   const u = new URL(e.request.url);
   if (e.request.method !== "GET") return;
-  if (u.hostname.endsWith("basemaps.cartocdn.com")) {
+  if (u.hostname === "tile.openstreetmap.org") {
     e.respondWith(caches.open("lokus-karte").then(async c => {
       const hit = await c.match(e.request); if (hit) return hit;
       const r = await fetch(e.request); if (r.ok) { c.put(e.request, r.clone()); if (Math.random() < 0.02) trim("lokus-karte", 3000); }

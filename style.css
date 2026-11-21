@@ -135,3 +135,6 @@ textarea{min-height:64px;resize:vertical}
   .foot{grid-column:1}
 }
 @media (prefers-reduced-motion:no-preference){.lk-pin .b{transition:transform .15s}}
+
+/* Dunkle Karte: OSM-Kacheln umgekehrt */
+.map-dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.6); }
