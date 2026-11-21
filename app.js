@@ -55,6 +55,10 @@ function linkManifest() {
     background_color: "#14120f", theme_color: "#14120f",
     icons: [{ src: base + "icon-192.png", sizes: "192x192", type: "image/png" }, { src: base + "icon-512-any.png", sizes: "512x512", type: "image/png" }] };
   const l = document.querySelector('link[rel="manifest"]');
+  // iPhone/iPad merken sich das Manifest beim Laden und ignorieren spätere Änderungen. Ohne Manifest
+  // nimmt iOS die aktuelle Adresse (mit ?k=…) als Start der Home-Bildschirm-App, Name und Icon
+  // kommen aus den apple-Meta-Tags.
+  if (l && IOS) { l.remove(); return; }
   if (l) l.href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(m));
 }
 linkManifest();
@@ -283,7 +287,7 @@ function renderBanner() {
   if (invite && !token) h = `<div class="banner"><b>Willkommen bei Lokus! Wie heißt du? Dein Name steht bei deinen Bewertungen.</b>
       <input type="text" id="joinName" maxlength="30" placeholder="z. B. Mama" autocomplete="given-name" style="flex:1 1 140px">
       <button class="secondary" id="joinBtn">Mitmachen</button></div>`;
-  else if (!token && !invite && !store.get("hideNoLink", false)) h = `<div class="banner"><b>Bewerten, Notizen und Favoriten gehen nur über den Familien-Link. Öffne ihn einmal hier auf diesem Gerät.</b><button class="secondary" id="noLinkOk">Ok</button></div>`;
+  else if (!token && !invite && !store.get("hideNoLink", false)) h = `<div class="banner"><b>${matchMedia("(display-mode: standalone)").matches || navigator.standalone ? "Diese App kennt deinen Namen noch nicht. So geht's: App vom Home-Bildschirm löschen, den Familien-Link in Safari öffnen, Namen eingeben, dann „Teilen → Zum Home-Bildschirm“." : "Bewerten, Notizen und Favoriten gehen nur über den Familien-Link. Öffne ihn einmal hier auf diesem Gerät."}</b><button class="secondary" id="noLinkOk">Ok</button></div>`;
   else if (S.geoErr) h = `<div class="banner"><b>${esc(S.geoErr)}</b><button class="secondary" id="geoRetry">Nochmal versuchen</button></div>`;
   else if (!S.index) h = `<div class="banner"><b>Die Toiletten-Daten fehlen noch. Sie werden einmal pro Woche geladen.</b></div>`;
   else if (S.groupErr && token) h = `<div class="banner"><b>Bewertungen gerade nicht erreichbar (${esc(S.groupErr)}).</b></div>`;

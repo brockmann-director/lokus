@@ -7,7 +7,8 @@
 <meta name="referrer" content="no-referrer">
 <title>Lokus</title>
 <meta name="description" content="Die nächste Toilette, schnell gefunden.">
-<link rel="manifest" href="manifest.webmanifest">
+<script>/* Manifest nur außerhalb von iOS: dort startet die Home-Bildschirm-App sonst ohne Familien-Schlüssel */
+if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1))) document.write('<link rel="manifest" href="manifest.webmanifest">');</script>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
