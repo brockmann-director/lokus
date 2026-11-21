@@ -283,6 +283,7 @@ function renderBanner() {
   if (invite && !token) h = `<div class="banner"><b>Willkommen bei Lokus! Wie heißt du? Dein Name steht bei deinen Bewertungen.</b>
       <input type="text" id="joinName" maxlength="30" placeholder="z. B. Mama" autocomplete="given-name" style="flex:1 1 140px">
       <button class="secondary" id="joinBtn">Mitmachen</button></div>`;
+  else if (!token && !invite && !store.get("hideNoLink", false)) h = `<div class="banner"><b>Bewerten, Notizen und Favoriten gehen nur über den Familien-Link. Öffne ihn einmal hier auf diesem Gerät.</b><button class="secondary" id="noLinkOk">Ok</button></div>`;
   else if (S.geoErr) h = `<div class="banner"><b>${esc(S.geoErr)}</b><button class="secondary" id="geoRetry">Nochmal versuchen</button></div>`;
   else if (!S.index) h = `<div class="banner"><b>Die Toiletten-Daten fehlen noch. Sie werden einmal pro Woche geladen.</b></div>`;
   else if (S.groupErr && token) h = `<div class="banner"><b>Bewertungen gerade nicht erreichbar (${esc(S.groupErr)}).</b></div>`;
@@ -292,6 +293,7 @@ function renderBanner() {
   el.dataset.h = h;
   el.innerHTML = h; el.hidden = !h;
   $("joinBtn")?.addEventListener("click", join);
+  $("noLinkOk")?.addEventListener("click", () => { store.set("hideNoLink", true); render(); });
   $("joinName")?.addEventListener("keydown", ev => { if (ev.key === "Enter") join(); });
   $("geoRetry")?.addEventListener("click", () => { S.geoErr = null; startGeo(); render(); });
 }
@@ -309,7 +311,7 @@ function renderList() {
   const T_ = nearby(false, 12), M_ = S.more && (!S.filters.size || S.filters.has("fav")) ? nearby(true, 6) : [];
   const from = S.me ? "ab deinem Standort" : "ab Kartenmitte";
   let h = `<h2>Toiletten in der Nähe <small>${from}</small></h2>`;
-  if (T_.length) h += `<ul class="list">${T_.map(([d, p], i) => rowHTML(d, p, i === 0)).join("")}</ul>`;
+  if (T_.length) h += `<p class="hint">${token ? "Tippe auf eine Toilette: Hinführen, Sterne, Notiz und Favorit." : "Tippe auf eine Toilette zum Hinführen."}</p><ul class="list">${T_.map(([d, p], i) => rowHTML(d, p, i === 0)).join("")}</ul>`;
   else if (map.getZoom() < 10 && !S.me) h += `<p class="empty">Erlaube den Standort oder zoome in die Karte, dann erscheinen die Toiletten.</p>`;
   else h += `<p class="empty">${S.filters.size ? "Keine Toilette passt zu allen Filtern. Nimm einen Filter heraus." : "Hier ist keine Toilette eingetragen. Schau bei den weiteren Klos."}</p>`;
   if (M_.length) h += `<h2>Weitere Klos <small>Café, Kaufhaus, Bahnhof …</small></h2><ul class="list">${M_.map(([d, p]) => rowHTML(d, p, false)).join("")}</ul>`;
