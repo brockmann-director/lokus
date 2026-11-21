@@ -33,7 +33,7 @@ button,input,textarea{font:inherit;color:inherit}
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 24px}
 header{display:flex;align-items:center;gap:8px}
 .logo{font-family:var(--display);font-weight:800;font-size:1.6em;letter-spacing:-.02em;flex:1;display:flex;align-items:center;gap:8px;margin:0}
-.logo svg{width:30px;height:30px;flex:none}
+.logo svg{width:34px;height:38px;flex:none}
 .ibtn{appearance:none;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;min-width:46px;height:46px;padding:0 10px;
   font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:var(--fg)}
 .ibtn svg{width:22px;height:22px}

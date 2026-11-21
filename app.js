@@ -1,7 +1,7 @@
 // Lokus – nächste Toilette finden. Daten: OpenStreetMap (wöchentlich als Kacheln in data/),
 // gemeinsame Bewertungen/Notizen/Favoriten der Familie über Supabase (lk_*-Funktionen).
 "use strict";
-const VERSION = "1.1";
+const VERSION = "1.2";
 
 // ---------- Kleinkram ----------
 const $ = id => document.getElementById(id);
@@ -53,7 +53,7 @@ function linkManifest() {
   if (!params.get("k")) history.replaceState(null, "", start);
   const m = { name: "Lokus", short_name: "Lokus", start_url: start, scope: base, display: "standalone",
     background_color: "#14120f", theme_color: "#14120f",
-    icons: [{ src: base + "icon-192.png", sizes: "192x192", type: "image/png" }, { src: base + "icon-512.png", sizes: "512x512", type: "image/png" }] };
+    icons: [{ src: base + "icon-192.png", sizes: "192x192", type: "image/png" }, { src: base + "icon-512-any.png", sizes: "512x512", type: "image/png" }] };
   const l = document.querySelector('link[rel="manifest"]');
   if (l) l.href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(m));
 }

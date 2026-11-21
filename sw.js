@@ -1,7 +1,7 @@
 // Lokus Service Worker: App und Daten offline verfügbar.
 // App-Dateien: erst Netz, sonst Speicher. Toiletten-Daten: Speicher sofort, im Hintergrund auffrischen.
 // Kartenbilder: aus dem Speicher, wenn schon einmal geladen (höchstens ~3000 Stück).
-const V = "lokus-1.1";
+const V = "lokus-1.2";
 const SHELL = ["./", "index.html", "style.css?v=1", "app.js?v=1", "oh.js?v=1", "config.js?v=1", "vendor/leaflet.js?v=1.9.4", "vendor/leaflet.css?v=1.9.4",
   "icon.svg", "icon-192.png", "apple-touch-icon.png", "manifest.webmanifest",
   "vendor/fonts/atkinson-hyperlegible-latin-400-normal.woff2", "vendor/fonts/atkinson-hyperlegible-latin-700-normal.woff2", "vendor/fonts/bricolage-grotesque-latin-800-normal.woff2"];
