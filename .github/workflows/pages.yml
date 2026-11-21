@@ -31,6 +31,7 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html app.js oh.js style.css sw.js config.js manifest.webmanifest CNAME icon.svg icon-192.png icon-512.png icon-512-any.png apple-touch-icon.png vendor _site/
+          sed -i "s/__BUILD__/${{ github.run_number }}/g" _site/app.js _site/sw.js _site/index.html
       - name: Toiletten-Daten
         run: |
           if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.fresh }}" = "false" ]; then

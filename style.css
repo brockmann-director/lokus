@@ -138,3 +138,4 @@ textarea{min-height:64px;resize:vertical}
 
 /* Dunkle Karte: OSM-Kacheln umgekehrt */
 .map-dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.6); }
+.logo .build{font-family:var(--body, inherit);font-weight:400;font-size:.36em;letter-spacing:0;color:var(--muted, #8c8577);align-self:flex-end;margin:0 0 .5em 2px}

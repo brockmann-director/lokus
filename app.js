@@ -1,7 +1,7 @@
 // Lokus – nächste Toilette finden. Daten: OpenStreetMap (wöchentlich als Kacheln in data/),
 // gemeinsame Bewertungen/Notizen/Favoriten der Familie über Supabase (lk_*-Funktionen).
 "use strict";
-const VERSION = "1.2";
+const VERSION = "1.2", BUILD = "__BUILD__";
 
 // ---------- Kleinkram ----------
 const $ = id => document.getElementById(id);
@@ -84,7 +84,7 @@ const isGone = id => S.group.gone.some(g => g.place === id);
 async function loadIndex() {
   try { const r = await fetch("data/index.json", { cache: "no-cache" }); S.index = await r.json(); }
   catch (e) { S.index = null; }
-  $("ver").textContent = "Lokus " + VERSION + (S.index ? " · Daten vom " + new Date(S.index.built).toLocaleDateString("de-DE") : "");
+  $("ver").textContent = "Lokus " + VERSION + " · Build " + BUILD + (S.index ? " · Daten vom " + new Date(S.index.built).toLocaleDateString("de-DE") : "");
 }
 const tileKey = (lat, lon) => { const t = S.index.tile; return (Math.floor(lat / t) * t).toFixed(1) + "_" + (Math.floor(lon / t) * t).toFixed(1); };
 function addToilet(r) {
