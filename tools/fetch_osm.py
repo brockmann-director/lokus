@@ -43,7 +43,7 @@ def overpass(body, timeout=900):
                 req = urllib.request.Request(ep, data=data, headers={"User-Agent": UA})
                 with urllib.request.urlopen(req, timeout=timeout) as r:
                     js = json.load(r)
-                if js.get("remark") and "error" in js["remark"].lower():
+                if js.get("remark"):  # z. B. Zeitüberschreitung: Ergebnis unvollständig
                     raise RuntimeError(js["remark"])
                 return js["elements"]
             except Exception as e:  # noqa: BLE001
@@ -123,7 +123,12 @@ def build(out):
     for kind, body in MORE:
         print(kind, "…")
         n = 0
-        for el in overpass(body):
+        try:
+            els = overpass(body)
+        except Exception as e:  # noqa: BLE001
+            print("  ausgelassen:", e, file=sys.stderr)  # Toiletten zählen, Weitere Klos sind Bonus
+            els = []
+        for el in els:
             r = more_row(el, kind)
             if r:
                 tiles.setdefault(tile_key(r[1], r[2]), {"t": [], "w": []})["w"].append(r)
