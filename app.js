@@ -286,8 +286,13 @@ function renderBanner() {
   else if (S.geoErr) h = `<div class="banner"><b>${esc(S.geoErr)}</b><button class="secondary" id="geoRetry">Nochmal versuchen</button></div>`;
   else if (!S.index) h = `<div class="banner"><b>Die Toiletten-Daten fehlen noch. Sie werden einmal pro Woche geladen.</b></div>`;
   else if (S.groupErr && token) h = `<div class="banner"><b>Bewertungen gerade nicht erreichbar (${esc(S.groupErr)}).</b></div>`;
+  // Nur neu zeichnen, wenn sich der Text ändert: sonst verliert das Namensfeld bei jedem
+  // Standort-Update den Fokus und die Tastatur klappt zu
+  if (el.dataset.h === h) return;
+  el.dataset.h = h;
   el.innerHTML = h; el.hidden = !h;
   $("joinBtn")?.addEventListener("click", join);
+  $("joinName")?.addEventListener("keydown", ev => { if (ev.key === "Enter") join(); });
   $("geoRetry")?.addEventListener("click", () => { S.geoErr = null; startGeo(); render(); });
 }
 async function join() {
@@ -376,8 +381,13 @@ function render() {
   const all = [...S.places.values(), ...favPlaces()];
   const p = S.sel ? all.find(x => x.id === S.sel) : null;
   let nearT;
-  if (p) { renderDetail(p); nearT = nearby(false, 1)[0]?.[1]; }
-  else nearT = renderList();
+  if (p) {
+    // Detailansicht nur neu aufbauen, wenn sich wirklich etwas geändert hat: Standort-Updates
+    // sollen keine halb getippte Notiz oder gewählte Sterne löschen
+    const key = [p.id, token, JSON.stringify(ratingsFor(p.id)), isFav(p.id), isGone(p.id)].join("|");
+    if ($("sheet").dataset.key !== key) { renderDetail(p); $("sheet").dataset.key = key; }
+    nearT = nearby(false, 1)[0]?.[1];
+  } else { $("sheet").dataset.key = ""; nearT = renderList(); }
   drawPins(nearT);
 }
 function select(id) {
