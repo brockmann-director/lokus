@@ -28,6 +28,7 @@ MORE = [
     ("Tankstelle", 'nwr["amenity"="fuel"](area.a);'),
 ]
 KIND_IDS = {k: i for i, (k, _) in enumerate(MORE)}
+FALLBACK_BASE = None
 
 # Bits für Toiletten
 FREE, PAID, WC_YES, WC_LIMITED, WC_NO, BABY_YES, BABY_NO, CUSTOMERS, UNISEX = 1, 2, 4, 8, 16, 32, 64, 128, 256
@@ -45,6 +46,8 @@ def overpass(body, timeout=900):
                     js = json.load(r)
                 if js.get("remark"):  # z. B. Zeitüberschreitung: Ergebnis unvollständig
                     raise RuntimeError(js["remark"])
+                if not js["elements"]:  # leere Antwort = meist abgebrochen, nochmal versuchen
+                    raise RuntimeError("leere Antwort")
                 return js["elements"]
             except Exception as e:  # noqa: BLE001
                 last = e
@@ -112,6 +115,7 @@ def tile_key(lat, lon):
 def build(out):
     tiles = {}
     counts = {"toilets": 0}
+    missing = []
     print("Toiletten …")
     for el in overpass('nwr["amenity"="toilets"](area.a);'):
         r = toilet_row(el)
@@ -134,7 +138,11 @@ def build(out):
                 tiles.setdefault(tile_key(r[1], r[2]), {"t": [], "w": []})["w"].append(r)
                 n += 1
         counts[kind] = n
+        if n == 0:
+            missing.append(kind)
         time.sleep(5)
+    if missing and FALLBACK_BASE:
+        keep_old(tiles, counts, missing)
     os.makedirs(os.path.join(out, "data", "t"), exist_ok=True)
     for k, v in tiles.items():
         with open(os.path.join(out, "data", "t", k + ".json"), "w") as f:
@@ -144,6 +152,23 @@ def build(out):
     with open(os.path.join(out, "data", "index.json"), "w") as f:
         json.dump(index, f, ensure_ascii=False, separators=(",", ":"))
     print("Fertig:", counts, len(tiles), "Kacheln")
+
+
+def keep_old(tiles, counts, missing):
+    """Weitere-Klos-Arten, die diesmal leer kamen, aus den Daten der laufenden Seite übernehmen."""
+    try:
+        get = lambda p: json.loads(urllib.request.urlopen(urllib.request.Request(FALLBACK_BASE.rstrip("/") + p, headers={"User-Agent": UA}), timeout=60).read())
+        index = get("/data/index.json")
+        old_ids = {index["kinds"].index(k): k for k in missing if k in index["kinds"]}
+        for key in index["tiles"]:
+            rows = [r for r in get("/data/t/%s.json" % key).get("w", []) if r[3] in old_ids]
+            for r in rows:
+                r[3] = KIND_IDS[old_ids[r[3]]]
+                tiles.setdefault(key, {"t": [], "w": []})["w"].append(r)
+                counts[MORE[r[3]][0]] += 1
+        print("Von letzter Woche übernommen:", {k: counts[k] for k in missing})
+    except Exception as e:  # noqa: BLE001
+        print("  alte Weitere Klos nicht übernommen:", e, file=sys.stderr)
 
 
 def fallback(out, base):
@@ -162,6 +187,7 @@ def fallback(out, base):
 if __name__ == "__main__":
     out = sys.argv[1]
     fb = sys.argv[sys.argv.index("--fallback") + 1] if "--fallback" in sys.argv else None
+    FALLBACK_BASE = fb
     if fb and "--reuse" in sys.argv:
         # Nur Code geändert: Daten der laufenden Seite wiederverwenden, Overpass schonen
         try:
